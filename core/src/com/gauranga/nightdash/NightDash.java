@@ -18,13 +18,13 @@ public class NightDash extends ApplicationAdapter {
 	Random random;
 	ShapeRenderer shapeRenderer;
 
-	Texture[] dino;
-	int dino_state = 0;
+	Texture[] jack;
+	int jack_state = 0;
 	int pause = 0;
 	float gravity = 0.5f;
 	float velocity = 0;
-	float dino_y;
-	Rectangle dino_rect;
+	float jack_y;
+	Rectangle jack_rect;
 
 	Texture coin;
 	int coin_count = 0;
@@ -41,18 +41,18 @@ public class NightDash extends ApplicationAdapter {
 		random = new Random();
 		shapeRenderer = new ShapeRenderer();
 
-		// all textures for dino
-		dino = new Texture[8];
-		dino[0] = new Texture("run1.png");
-		dino[1] = new Texture("run2.png");
-		dino[2] = new Texture("run3.png");
-		dino[3] = new Texture("run4.png");
-		dino[4] = new Texture("run5.png");
-		dino[5] = new Texture("run6.png");
-		dino[6] = new Texture("run7.png");
-		dino[7] = new Texture("run8.png");
-		// initialize y coordinate of dino
-		dino_y = Gdx.graphics.getHeight()/3;
+		// all textures for jack
+		jack = new Texture[8];
+		jack[0] = new Texture("run1.png");
+		jack[1] = new Texture("run2.png");
+		jack[2] = new Texture("run3.png");
+		jack[3] = new Texture("run4.png");
+		jack[4] = new Texture("run5.png");
+		jack[5] = new Texture("run6.png");
+		jack[6] = new Texture("run7.png");
+		jack[7] = new Texture("run8.png");
+		// initialize y coordinate of jack
+		jack_y = Gdx.graphics.getHeight()/3;
 
 		// texture for coin
 		coin = new Texture("coin.png");
@@ -70,7 +70,7 @@ public class NightDash extends ApplicationAdapter {
 	@Override
 	public void render () {
 		batch.begin();
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+		//shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 		// draw the background
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -80,29 +80,29 @@ public class NightDash extends ApplicationAdapter {
 			velocity = -10;
 		}
 
-		// decide which dino texture to use
+		// decide which jack texture to use
 		if (pause < 5) {
 			pause++;
 		}
 		else {
 			pause = 0;
-			if (dino_state < dino.length-1) {
-				dino_state++;
+			if (jack_state < jack.length-1) {
+				jack_state++;
 			}
 			else {
-				dino_state = 0;
+				jack_state = 0;
 			}
 		}
-		// calculate the velocity and y coordinate of the dino
+		// calculate the velocity and y coordinate of the jack
 		velocity = velocity + gravity;
-		dino_y = dino_y-velocity;
-		if (dino_y <= 0) {
-			dino_y = 0;
+		jack_y = jack_y-velocity;
+		if (jack_y <= 0) {
+			jack_y = 0;
 		}
-		// draw the dino
-		batch.draw(dino[dino_state],200, dino_y);
-		// set rectangle for dino
-		dino_rect = new Rectangle(200, (int) dino_y, dino[dino_state].getWidth(), dino[dino_state].getHeight());
+		// draw the jack
+		batch.draw(jack[jack_state],200, (int) jack_y, 250, 330);
+		// set rectangle for jack
+		jack_rect = new Rectangle(200, (int) jack_y, 220, 300);
 
 		// add a new coin
 		if (coin_count < 100) {
@@ -122,9 +122,9 @@ public class NightDash extends ApplicationAdapter {
 			coin_xs.set(i, coin_xs.get(i)-5);
 		}
 
-		// check if dino collides with any coin
+		// check if jack collides with any coin
 		for (int i=0; i<coin_rect.size(); i++) {
-			if (Intersector.overlaps(coin_rect.get(i), dino_rect)) {
+			if (Intersector.overlaps(coin_rect.get(i), jack_rect)) {
 				coin_rect.remove(i);
 				coin_ys.remove(i);
 				coin_xs.remove(i);
@@ -132,7 +132,7 @@ public class NightDash extends ApplicationAdapter {
 			}
 		}
 
-		shapeRenderer.end();
+		//shapeRenderer.end();
 		batch.end();
 	}
 }
