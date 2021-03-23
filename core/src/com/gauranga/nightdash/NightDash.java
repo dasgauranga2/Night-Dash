@@ -5,7 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,6 +22,7 @@ public class NightDash extends ApplicationAdapter {
 	Random random;
 	ShapeRenderer shapeRenderer;
 	int GROUND_HEIGHT = 400;
+	int game_state = 0;
 
 	Texture[] jack;
 	int jack_state = 0;
@@ -35,6 +38,9 @@ public class NightDash extends ApplicationAdapter {
 	ArrayList<Integer> coin_ys = new ArrayList<>();
 	ArrayList<Rectangle> coin_rect = new ArrayList<>();
 	int COIN_DIFF = 700;
+
+	int score = 0;
+	BitmapFont font;
 	
 	@Override
 	public void create () {
@@ -62,6 +68,13 @@ public class NightDash extends ApplicationAdapter {
 
 		// texture for coin
 		coin = new Texture("coin.png");
+
+		// set font settings
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("roboto_mono.ttf"));
+		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		parameter.size = 150;
+		font = generator.generateFont(parameter);
+		generator.dispose();
 	}
 
 	// create a new coin
@@ -82,65 +95,83 @@ public class NightDash extends ApplicationAdapter {
 		// draw the ground grass
 		batch.draw(ground, 0, GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
 
-		// check if screen is touched
-		if (Gdx.input.justTouched()) {
-			velocity = -10;
-		}
+		if (game_state == 1) {
+			// check if screen is touched
+			if (Gdx.input.justTouched()) {
+				velocity = -10;
+			}
 
-		// decide which jack texture to use
-		if (pause < 5) {
-			pause++;
-		}
-		else {
-			pause = 0;
-			if (jack_state < jack.length-1) {
-				jack_state++;
+			// decide which jack texture to use
+			if (pause < 5) {
+				pause++;
 			}
 			else {
-				jack_state = 0;
+				pause = 0;
+				if (jack_state < jack.length-1) {
+					jack_state++;
+				}
+				else {
+					jack_state = 0;
+				}
+			}
+			// calculate the velocity and y coordinate of the jack
+			velocity = velocity + gravity;
+			jack_y = jack_y-velocity;
+			if (jack_y <= GROUND_HEIGHT) {
+				jack_y = GROUND_HEIGHT;
+			}
+			// draw the jack
+			batch.draw(jack[jack_state],200, (int) jack_y, 250, 330);
+			// set rectangle for jack
+			jack_rect = new Rectangle(200, (int) jack_y, 220, 300);
+
+			// add a new coin
+			if (coin_count < 100) {
+				coin_count++;
+			}
+			else {
+				int start = random.nextInt(50);
+				coin_count = start;
+				make_coin();
+			}
+			coin_rect.clear();
+			// draw all the coins
+			for (int i=0; i<coin_xs.size(); i++) {
+				batch.draw(coin, coin_xs.get(i), coin_ys.get(i),100,100);
+				// create rectangle for each coin
+				coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 100, 100));
+				// move each coin to the left
+				coin_xs.set(i, coin_xs.get(i)-10);
+			}
+
+			// check if jack collides with any coin
+			for (int i=0; i<coin_rect.size(); i++) {
+				if (Intersector.overlaps(coin_rect.get(i), jack_rect)) {
+					coin_rect.remove(i);
+					coin_ys.remove(i);
+					coin_xs.remove(i);
+					score++;
+					break;
+				}
 			}
 		}
-		// calculate the velocity and y coordinate of the jack
-		velocity = velocity + gravity;
-		jack_y = jack_y-velocity;
-		if (jack_y <= GROUND_HEIGHT) {
-			jack_y = GROUND_HEIGHT;
+		else if (game_state == 0) {
+			// game waiting to start
+			if (Gdx.input.justTouched()) {
+				// change the game state
+				game_state = 1;
+			}
 		}
-		// draw the jack
-		batch.draw(jack[jack_state],200, (int) jack_y, 250, 330);
-		// set rectangle for jack
-		jack_rect = new Rectangle(200, (int) jack_y, 220, 300);
-
-		// add a new coin
-		if (coin_count < 100) {
-			coin_count++;
-		}
-		else {
-			int start = random.nextInt(50);
-			coin_count = start;
-			make_coin();
-		}
-		coin_rect.clear();
-		// draw all the coins
-		for (int i=0; i<coin_xs.size(); i++) {
-			batch.draw(coin, coin_xs.get(i), coin_ys.get(i),100,100);
-			// create rectangle for each coin
-			coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 100, 100));
-			// move each coin to the left
-			coin_xs.set(i, coin_xs.get(i)-10);
-		}
-
-		// check if jack collides with any coin
-		for (int i=0; i<coin_rect.size(); i++) {
-			if (Intersector.overlaps(coin_rect.get(i), jack_rect)) {
-				coin_rect.remove(i);
-				coin_ys.remove(i);
-				coin_xs.remove(i);
-				break;
+		else if (game_state == 2) {
+			// game over
+			if (Gdx.input.justTouched()) {
+				game_state = 1;
 			}
 		}
 
-		//shapeRenderer.end();
+		// display the score
+		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-150);
+
 		batch.end();
 
 		// draw the ground
