@@ -2,6 +2,7 @@ package com.gauranga.nightdash;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,8 +16,10 @@ import java.util.Random;
 public class NightDash extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
+	Texture ground;
 	Random random;
 	ShapeRenderer shapeRenderer;
+	int GROUND_HEIGHT = 400;
 
 	Texture[] jack;
 	int jack_state = 0;
@@ -31,6 +34,7 @@ public class NightDash extends ApplicationAdapter {
 	ArrayList<Integer> coin_xs = new ArrayList<>();
 	ArrayList<Integer> coin_ys = new ArrayList<>();
 	ArrayList<Rectangle> coin_rect = new ArrayList<>();
+	int COIN_DIFF = 700;
 	
 	@Override
 	public void create () {
@@ -38,6 +42,8 @@ public class NightDash extends ApplicationAdapter {
 
 		// background texture
 		background = new Texture("night_background.png");
+		// ground texture
+		ground = new Texture("ground2.png");
 		random = new Random();
 		shapeRenderer = new ShapeRenderer();
 
@@ -52,7 +58,7 @@ public class NightDash extends ApplicationAdapter {
 		jack[6] = new Texture("run7.png");
 		jack[7] = new Texture("run8.png");
 		// initialize y coordinate of jack
-		jack_y = Gdx.graphics.getHeight()/3;
+		jack_y = GROUND_HEIGHT;
 
 		// texture for coin
 		coin = new Texture("coin.png");
@@ -61,7 +67,7 @@ public class NightDash extends ApplicationAdapter {
 	// create a new coin
 	public void make_coin() {
 		// y coordinate for the coin
-		float height = random.nextFloat() * Gdx.graphics.getHeight()/2;
+		float height = (random.nextFloat() * COIN_DIFF) + GROUND_HEIGHT+100;
 
 		coin_xs.add(Gdx.graphics.getWidth());
 		coin_ys.add((int) height);
@@ -70,10 +76,11 @@ public class NightDash extends ApplicationAdapter {
 	@Override
 	public void render () {
 		batch.begin();
-		//shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
 		// draw the background
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		// draw the ground grass
+		batch.draw(ground, 0, GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
 
 		// check if screen is touched
 		if (Gdx.input.justTouched()) {
@@ -96,8 +103,8 @@ public class NightDash extends ApplicationAdapter {
 		// calculate the velocity and y coordinate of the jack
 		velocity = velocity + gravity;
 		jack_y = jack_y-velocity;
-		if (jack_y <= 0) {
-			jack_y = 0;
+		if (jack_y <= GROUND_HEIGHT) {
+			jack_y = GROUND_HEIGHT;
 		}
 		// draw the jack
 		batch.draw(jack[jack_state],200, (int) jack_y, 250, 330);
@@ -109,7 +116,8 @@ public class NightDash extends ApplicationAdapter {
 			coin_count++;
 		}
 		else {
-			coin_count = 0;
+			int start = random.nextInt(50);
+			coin_count = start;
 			make_coin();
 		}
 		coin_rect.clear();
@@ -119,7 +127,7 @@ public class NightDash extends ApplicationAdapter {
 			// create rectangle for each coin
 			coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 100, 100));
 			// move each coin to the left
-			coin_xs.set(i, coin_xs.get(i)-5);
+			coin_xs.set(i, coin_xs.get(i)-10);
 		}
 
 		// check if jack collides with any coin
@@ -134,5 +142,11 @@ public class NightDash extends ApplicationAdapter {
 
 		//shapeRenderer.end();
 		batch.end();
+
+		// draw the ground
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.setColor(Color.BLACK);
+		shapeRenderer.rect(0,0, Gdx.graphics.getWidth(), GROUND_HEIGHT);
+		shapeRenderer.end();
 	}
 }
