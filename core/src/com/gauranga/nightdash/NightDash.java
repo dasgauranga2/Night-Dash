@@ -2,6 +2,7 @@ package com.gauranga.nightdash;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,7 +26,8 @@ public class NightDash extends ApplicationAdapter {
 	int game_state = 0;
 	int time_left = 0;
 	int TOTAL_TIME = 50;
-	int FONT_SIZE = 280;
+	int FONT_SIZE = 200;
+	Sound coin_sound;
 
 	Texture[] jack;
 	int jack_state = 0;
@@ -55,6 +57,8 @@ public class NightDash extends ApplicationAdapter {
 		ground = new Texture("ground2.png");
 		random = new Random();
 		shapeRenderer = new ShapeRenderer();
+		// load sound
+		coin_sound = Gdx.audio.newSound(Gdx.files.internal("coin_sound.wav"));
 
 		// all textures for jack
 		jack = new Texture[8];
@@ -155,6 +159,7 @@ public class NightDash extends ApplicationAdapter {
 					coin_ys.remove(i);
 					coin_xs.remove(i);
 					score++;
+					coin_sound.play();
 					break;
 				}
 			}
@@ -181,7 +186,7 @@ public class NightDash extends ApplicationAdapter {
 			go_parameter.size = FONT_SIZE;
 			go_font = go_generator.generateFont(go_parameter);
 			go_generator.dispose();
-			go_font.draw(batch, "GAME\nOVER", Gdx.graphics.getWidth()/2-150, GROUND_HEIGHT+1000);
+			go_font.draw(batch, "GAME OVER", Gdx.graphics.getWidth()/2-220, Gdx.graphics.getHeight()-600);
 
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
