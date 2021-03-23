@@ -173,6 +173,11 @@ public class NightDash extends ApplicationAdapter {
 		}
 		else if (game_state == 0) {
 			// game waiting to start
+
+			display_font("NIGHT DASH", Gdx.graphics.getWidth()/2 - 320, Gdx.graphics.getHeight()/2+300, "amatic.ttf", 280);
+			display_font("Collect coins", Gdx.graphics.getWidth()/2 - 200, Gdx.graphics.getHeight()/2, "roboto_mono.ttf", 60);
+			display_font("before the timer runs out", Gdx.graphics.getWidth()/2 - 450, Gdx.graphics.getHeight()/2-100, "roboto_mono.ttf", 60);
+
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
 				game_state = 1;
@@ -220,5 +225,15 @@ public class NightDash extends ApplicationAdapter {
 		shapeRenderer.setColor(Color.BLACK);
 		shapeRenderer.rect(0,0, Gdx.graphics.getWidth(), GROUND_HEIGHT);
 		shapeRenderer.end();
+	}
+
+	public void display_font(String text, int x, int y, String font_family, int size) {
+		BitmapFont custom_font = new BitmapFont();
+		FreeTypeFontGenerator custom_generator = new FreeTypeFontGenerator(Gdx.files.internal(font_family));
+		FreeTypeFontGenerator.FreeTypeFontParameter custom_parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		custom_parameter.size = size;
+		custom_font = custom_generator.generateFont(custom_parameter);
+		custom_generator.dispose();
+		custom_font.draw(batch, text, x, y);
 	}
 }
