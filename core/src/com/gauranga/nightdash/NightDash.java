@@ -21,6 +21,7 @@ public class NightDash extends ApplicationAdapter {
 	Texture background;
 	Texture ground;
 	Random random;
+	Texture hourglass;
 	ShapeRenderer shapeRenderer;
 	int GROUND_HEIGHT = 400;
 	int game_state = 0;
@@ -59,6 +60,7 @@ public class NightDash extends ApplicationAdapter {
 		shapeRenderer = new ShapeRenderer();
 		// load sound
 		coin_sound = Gdx.audio.newSound(Gdx.files.internal("coin_sound.wav"));
+		hourglass = new Texture("hourglass.png");
 
 		// all textures for jack
 		jack = new Texture[8];
@@ -79,7 +81,7 @@ public class NightDash extends ApplicationAdapter {
 		// set font settings
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("roboto_mono.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-		parameter.size = 150;
+		parameter.size = 120;
 		font = generator.generateFont(parameter);
 		generator.dispose();
 	}
@@ -205,9 +207,10 @@ public class NightDash extends ApplicationAdapter {
 		}
 
 		// display the score
-		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-300);
+		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-400);
 		// display the time left
-		font.draw(batch, String.valueOf(time_left), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-100);
+		batch.draw(hourglass, Gdx.graphics.getWidth()-400, Gdx.graphics.getHeight()-hourglass.getWidth()-50, 100, 100);
+		font.draw(batch, String.valueOf(time_left), Gdx.graphics.getWidth()-220, Gdx.graphics.getHeight()-80);
 
 		batch.end();
 
