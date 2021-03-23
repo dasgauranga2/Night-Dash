@@ -23,6 +23,9 @@ public class NightDash extends ApplicationAdapter {
 	ShapeRenderer shapeRenderer;
 	int GROUND_HEIGHT = 400;
 	int game_state = 0;
+	int time_left = 0;
+	int TOTAL_TIME = 50;
+	int FONT_SIZE = 280;
 
 	Texture[] jack;
 	int jack_state = 0;
@@ -113,6 +116,7 @@ public class NightDash extends ApplicationAdapter {
 				else {
 					jack_state = 0;
 				}
+				time_left--;
 			}
 			// calculate the velocity and y coordinate of the jack
 			velocity = velocity + gravity;
@@ -154,23 +158,51 @@ public class NightDash extends ApplicationAdapter {
 					break;
 				}
 			}
+
+			// check if time is over
+			if (time_left == 0) {
+				game_state = 2;
+			}
 		}
 		else if (game_state == 0) {
 			// game waiting to start
 			if (Gdx.input.justTouched()) {
-				// change the game state
+				time_left = TOTAL_TIME;
 				game_state = 1;
 			}
 		}
 		else if (game_state == 2) {
 			// game over
+
+			// display game over text
+			BitmapFont go_font = new BitmapFont();
+			FreeTypeFontGenerator go_generator = new FreeTypeFontGenerator(Gdx.files.internal("amatic.ttf"));
+			FreeTypeFontGenerator.FreeTypeFontParameter go_parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+			go_parameter.size = FONT_SIZE;
+			go_font = go_generator.generateFont(go_parameter);
+			go_generator.dispose();
+			go_font.draw(batch, "GAME\nOVER", Gdx.graphics.getWidth()/2-150, GROUND_HEIGHT+1000);
+
 			if (Gdx.input.justTouched()) {
+				time_left = TOTAL_TIME;
 				game_state = 1;
+				// reset the game
+				jack_state = 0;
+				pause = 0;
+				velocity = 0;
+				coin_count = 0;
+				coin_xs.clear();
+				coin_ys.clear();
+				coin_rect.clear();
+				score = 0;
+				jack_y = GROUND_HEIGHT;
 			}
 		}
 
 		// display the score
-		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-150);
+		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-300);
+		// display the time left
+		font.draw(batch, String.valueOf(time_left), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-100);
 
 		batch.end();
 
