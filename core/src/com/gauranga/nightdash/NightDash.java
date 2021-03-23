@@ -147,9 +147,9 @@ public class NightDash extends ApplicationAdapter {
 			coin_rect.clear();
 			// draw all the coins
 			for (int i=0; i<coin_xs.size(); i++) {
-				batch.draw(coin, coin_xs.get(i), coin_ys.get(i),100,100);
+				batch.draw(coin, coin_xs.get(i), coin_ys.get(i),150,150);
 				// create rectangle for each coin
-				coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 100, 100));
+				coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 150, 150));
 				// move each coin to the left
 				coin_xs.set(i, coin_xs.get(i)-10);
 			}
@@ -188,7 +188,7 @@ public class NightDash extends ApplicationAdapter {
 			go_parameter.size = FONT_SIZE;
 			go_font = go_generator.generateFont(go_parameter);
 			go_generator.dispose();
-			go_font.draw(batch, "GAME OVER", Gdx.graphics.getWidth()/2-220, Gdx.graphics.getHeight()-600);
+			go_font.draw(batch, "GAME OVER", Gdx.graphics.getWidth()/2-220, Gdx.graphics.getHeight()-700);
 
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
@@ -207,7 +207,8 @@ public class NightDash extends ApplicationAdapter {
 		}
 
 		// display the score
-		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-400);
+		batch.draw(coin, Gdx.graphics.getWidth()/2 - 60, Gdx.graphics.getHeight()-500, 100, 100);
+		font.draw(batch, String.valueOf(score), Gdx.graphics.getWidth()/2 + 60, FONT_SIZE/2 + Gdx.graphics.getHeight()-500);
 		// display the time left
 		batch.draw(hourglass, Gdx.graphics.getWidth()-400, Gdx.graphics.getHeight()-hourglass.getWidth()-50, 100, 100);
 		font.draw(batch, String.valueOf(time_left), Gdx.graphics.getWidth()-220, Gdx.graphics.getHeight()-80);
