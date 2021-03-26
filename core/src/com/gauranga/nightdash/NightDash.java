@@ -20,7 +20,6 @@ public class NightDash extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
 	Texture ground;
-	int ground_x = 0;
 	Random random;
 	Texture hourglass;
 	ShapeRenderer shapeRenderer;
@@ -44,6 +43,7 @@ public class NightDash extends ApplicationAdapter {
 
 	Texture coin;
 	int coin_count = 0;
+	int COIN_SPEED = 10;
 	ArrayList<Integer> coin_xs = new ArrayList<>();
 	ArrayList<Integer> coin_ys = new ArrayList<>();
 	ArrayList<Rectangle> coin_rect = new ArrayList<>();
@@ -76,16 +76,12 @@ public class NightDash extends ApplicationAdapter {
 		jack[5] = new Texture("run6.png");
 		jack[6] = new Texture("run7.png");
 		jack[7] = new Texture("run8.png");
-		// initialize y coordinate of jack
-		jack_y = GROUND_HEIGHT;
 
 		// texture for coin
 		coin = new Texture("coin.png");
 
-		// set grass coordinates
-		for (int i=0; i<num_grass; i++) {
-			grass_x[i] = Gdx.graphics.getWidth() * i;
-		}
+		// reset game settings
+		reset_game();
 
 		// set font settings
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("roboto_mono.ttf"));
@@ -93,6 +89,31 @@ public class NightDash extends ApplicationAdapter {
 		parameter.size = 120;
 		font = generator.generateFont(parameter);
 		generator.dispose();
+	}
+
+	public void reset_game() {
+
+		pause = 0;
+		velocity = 0;
+		coin_count = 0;
+
+		// clear all the array lists
+		coin_xs.clear();
+		coin_ys.clear();
+		coin_rect.clear();
+
+		// initialize the value of score to zero
+		score = 0;
+
+		// initialize y coordinate of jack
+		jack_y = GROUND_HEIGHT;
+
+		// set grass coordinates
+		for (int i=0; i<num_grass; i++) {
+			grass_x[i] = Gdx.graphics.getWidth() * i;
+		}
+
+		COIN_SPEED = 10;
 	}
 
 	// create a new coin
@@ -114,7 +135,7 @@ public class NightDash extends ApplicationAdapter {
 		if (game_state == 1) {
 			// check if screen is touched
 			if (Gdx.input.justTouched()) {
-				velocity = -10;
+				velocity = -15;
 			}
 
 			for (int i=0; i<num_grass; i++) {
@@ -144,8 +165,9 @@ public class NightDash extends ApplicationAdapter {
 				time_left--;
 			}
 			// calculate the velocity and y coordinate of the jack
-			velocity = velocity + gravity;
+			velocity = velocity + gravity + jack_y*0.0008f;
 			jack_y = jack_y-velocity;
+			// prevent jack from falling below the screen
 			if (jack_y <= GROUND_HEIGHT) {
 				jack_y = GROUND_HEIGHT;
 			}
@@ -170,7 +192,7 @@ public class NightDash extends ApplicationAdapter {
 				// create rectangle for each coin
 				coin_rect.add(new Rectangle(coin_xs.get(i), coin_ys.get(i), 150, 150));
 				// move each coin to the left
-				coin_xs.set(i, coin_xs.get(i)-10);
+				coin_xs.set(i, coin_xs.get(i)-COIN_SPEED);
 			}
 
 			// check if jack collides with any coin
@@ -180,6 +202,11 @@ public class NightDash extends ApplicationAdapter {
 					coin_ys.remove(i);
 					coin_xs.remove(i);
 					score++;
+					// for every 10 points move coins faster
+					if (score%10 == 0) {
+						COIN_SPEED = COIN_SPEED+3;
+					}
+					// play coin sound
 					coin_sound.play();
 					break;
 				}
@@ -219,19 +246,7 @@ public class NightDash extends ApplicationAdapter {
 				game_state = 1;
 				// reset the game
 				jack_state = 0;
-				pause = 0;
-				velocity = 0;
-				coin_count = 0;
-				coin_xs.clear();
-				coin_ys.clear();
-				coin_rect.clear();
-				score = 0;
-				jack_y = GROUND_HEIGHT;
-
-				// set grass coordinates
-				for (int i=0; i<num_grass; i++) {
-					grass_x[i] = Gdx.graphics.getWidth() * i;
-				}
+				reset_game();
 			}
 		}
 
