@@ -20,13 +20,14 @@ public class NightDash extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
 	Texture ground;
+	int ground_x = 0;
 	Random random;
 	Texture hourglass;
 	ShapeRenderer shapeRenderer;
 	int GROUND_HEIGHT = 400;
 	int game_state = 0;
 	int time_left = 0;
-	int TOTAL_TIME = 50;
+	int TOTAL_TIME = 500;
 	int FONT_SIZE = 200;
 	Sound coin_sound;
 
@@ -37,6 +38,9 @@ public class NightDash extends ApplicationAdapter {
 	float velocity = 0;
 	float jack_y;
 	Rectangle jack_rect;
+
+	int num_grass = 4;
+	float[] grass_x = new float[num_grass];
 
 	Texture coin;
 	int coin_count = 0;
@@ -78,6 +82,11 @@ public class NightDash extends ApplicationAdapter {
 		// texture for coin
 		coin = new Texture("coin.png");
 
+		// set grass coordinates
+		for (int i=0; i<num_grass; i++) {
+			grass_x[i] = Gdx.graphics.getWidth() * i;
+		}
+
 		// set font settings
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("roboto_mono.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -101,13 +110,23 @@ public class NightDash extends ApplicationAdapter {
 
 		// draw the background
 		batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		// draw the ground grass
-		batch.draw(ground, 0, GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
 
 		if (game_state == 1) {
 			// check if screen is touched
 			if (Gdx.input.justTouched()) {
 				velocity = -10;
+			}
+
+			for (int i=0; i<num_grass; i++) {
+				// draw the ground grass
+				batch.draw(ground, grass_x[i], GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
+				// move grass to the left
+				grass_x[i] = grass_x[i] - 4;
+
+				// check if grass goes out of the screen
+				if (grass_x[i] < -Gdx.graphics.getWidth()) {
+					grass_x[i] = grass_x[i] + num_grass*Gdx.graphics.getWidth();
+				}
 			}
 
 			// decide which jack texture to use
@@ -208,6 +227,11 @@ public class NightDash extends ApplicationAdapter {
 				coin_rect.clear();
 				score = 0;
 				jack_y = GROUND_HEIGHT;
+
+				// set grass coordinates
+				for (int i=0; i<num_grass; i++) {
+					grass_x[i] = Gdx.graphics.getWidth() * i;
+				}
 			}
 		}
 
