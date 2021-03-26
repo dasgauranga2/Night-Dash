@@ -2,6 +2,7 @@ package com.gauranga.nightdash;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 import java.util.Random;
 
+import sun.rmi.runtime.Log;
+
 public class NightDash extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture background;
@@ -26,13 +29,14 @@ public class NightDash extends ApplicationAdapter {
 	int GROUND_HEIGHT = 400;
 	int game_state = 0;
 	int time_left = 0;
-	int TOTAL_TIME = 100;
+	int TOTAL_TIME = 500;
 	int FONT_SIZE = 200;
 	Sound coin_sound;
 	int high_score = 0;
 
 	Texture[] jack;
 	int jack_state = 0;
+	int foot_pause = 0;
 	int pause = 0;
 	float gravity = 0.5f;
 	float velocity = 0;
@@ -52,7 +56,9 @@ public class NightDash extends ApplicationAdapter {
 
 	int score = 0;
 	BitmapFont font;
-	
+
+	Music grass_sound;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -65,6 +71,8 @@ public class NightDash extends ApplicationAdapter {
 		shapeRenderer = new ShapeRenderer();
 		// load sound
 		coin_sound = Gdx.audio.newSound(Gdx.files.internal("coin_sound.wav"));
+		grass_sound = Gdx.audio.newMusic(Gdx.files.internal("footsteps.mp3"));
+		grass_sound.setLooping(true);
 		hourglass = new Texture("hourglass.png");
 
 		// all textures for jack
@@ -166,7 +174,7 @@ public class NightDash extends ApplicationAdapter {
 				time_left--;
 			}
 			// calculate the velocity and y coordinate of the jack
-			velocity = velocity + gravity + jack_y*0.0008f;
+			velocity = velocity + gravity + jack_y*0.001f;
 			jack_y = jack_y-velocity;
 			// prevent jack from falling below the screen
 			if (jack_y <= GROUND_HEIGHT) {
@@ -215,6 +223,7 @@ public class NightDash extends ApplicationAdapter {
 
 			// check if time is over
 			if (time_left == 0) {
+				grass_sound.stop();
 				game_state = 2;
 			}
 		}
@@ -228,6 +237,7 @@ public class NightDash extends ApplicationAdapter {
 
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
+				grass_sound.play();
 				game_state = 1;
 			}
 		}
@@ -248,10 +258,11 @@ public class NightDash extends ApplicationAdapter {
 			// update game high score
 			high_score = Math.max(high_score, score);
 			// display high score
-			display_font("HIGH SCORE : " + high_score, Gdx.graphics.getWidth()/2 - 380, Gdx.graphics.getHeight()-1000, "amatic.ttf", 250);
+			display_font("HIGH SCORE : " + high_score, Gdx.graphics.getWidth()/2 - 420, Gdx.graphics.getHeight()-1000, "amatic.ttf", 250);
 
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
+				grass_sound.play();
 				game_state = 1;
 				// reset the game
 				jack_state = 0;
