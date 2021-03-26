@@ -26,9 +26,10 @@ public class NightDash extends ApplicationAdapter {
 	int GROUND_HEIGHT = 400;
 	int game_state = 0;
 	int time_left = 0;
-	int TOTAL_TIME = 500;
+	int TOTAL_TIME = 100;
 	int FONT_SIZE = 200;
 	Sound coin_sound;
+	int high_score = 0;
 
 	Texture[] jack;
 	int jack_state = 0;
@@ -220,7 +221,8 @@ public class NightDash extends ApplicationAdapter {
 		else if (game_state == 0) {
 			// game waiting to start
 
-			display_font("NIGHT DASH", Gdx.graphics.getWidth()/2 - 320, Gdx.graphics.getHeight()/2+300, "amatic.ttf", 280);
+			batch.draw(ground, 0, GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
+			display_font("NIGHT DASH", Gdx.graphics.getWidth()/2 - 360, Gdx.graphics.getHeight()/2+300, "amatic.ttf", 280);
 			display_font("Collect coins", Gdx.graphics.getWidth()/2 - 200, Gdx.graphics.getHeight()/2, "roboto_mono.ttf", 60);
 			display_font("before the timer runs out", Gdx.graphics.getWidth()/2 - 450, Gdx.graphics.getHeight()/2-100, "roboto_mono.ttf", 60);
 
@@ -232,6 +234,8 @@ public class NightDash extends ApplicationAdapter {
 		else if (game_state == 2) {
 			// game over
 
+			batch.draw(ground, 0, GROUND_HEIGHT, Gdx.graphics.getWidth(), 150);
+
 			// display game over text
 			BitmapFont go_font = new BitmapFont();
 			FreeTypeFontGenerator go_generator = new FreeTypeFontGenerator(Gdx.files.internal("amatic.ttf"));
@@ -240,6 +244,11 @@ public class NightDash extends ApplicationAdapter {
 			go_font = go_generator.generateFont(go_parameter);
 			go_generator.dispose();
 			go_font.draw(batch, "GAME OVER", Gdx.graphics.getWidth()/2-220, Gdx.graphics.getHeight()-700);
+
+			// update game high score
+			high_score = Math.max(high_score, score);
+			// display high score
+			display_font("HIGH SCORE : " + high_score, Gdx.graphics.getWidth()/2 - 380, Gdx.graphics.getHeight()-1000, "amatic.ttf", 250);
 
 			if (Gdx.input.justTouched()) {
 				time_left = TOTAL_TIME;
